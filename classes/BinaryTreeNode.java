@@ -3,9 +3,10 @@ package project4.classes;
 import project4.interfaces.Position;
 
 /**
- * application to fiddle with binary trees
+ * application to set node of a binary tree
  * 
- * @author Renato Oppliger, Thomas Wacker
+ * @author Renato Oppliger, Tom Wacker
+ * @version 1.0
  */
 public class BinaryTreeNode<E> implements Position<E> {
 	
@@ -32,7 +33,7 @@ public class BinaryTreeNode<E> implements Position<E> {
 	}
 
 	/**
-	 * returns the element to store
+	 * returns the element
 	 * 
 	 * @return element
 	 */

@@ -9,44 +9,54 @@ import project4.exceptions.UnemptyTreeException;
 import project4.interfaces.Position;
 import project4.interfaces.Tree;
 
+/**
+ * application to fiddle with general trees
+ * 
+ * @author Renato Oppliger, Tom Wacker
+ * @version 1.0
+ */
 public class LinkedTree<E> implements Tree<E> {
 
 	/** holds the number of nodes */
 	private int size;
 	/** holds the root node */
 	private TreeNode<E> root;
-	private List<Position<E>> childrenList;
-	/** holds the list for saving elements of type <E> */
-	private List<E> elementList;
-	/** holds the list for saving elements of type Position<E> */
-	private List<Position<E>> positionList;
-	/** holds the list for saving the descendants of type Position<E> */
-	private List<Position<E>> descendantList;
-	/** holds the list for saving the descendants of type Position<E> */
-	private List<Position<E>> ancestorList;
 	
+	/**
+	 * constructor to set default values
+	 */
 	public LinkedTree() {
 		this.size = 0;
 		this.root = null;
-		this.childrenList = new ArrayList<Position<E>>();
-		this.elementList = new ArrayList<E>();
-		this.positionList = new ArrayList<Position<E>>();
-		this.descendantList = new ArrayList<Position<E>>();
-		this.ancestorList = new ArrayList<Position<E>>();
 	}
 	
+	/**
+	 * returns the number of nodes
+	 * 
+	 * @return number of nodes
+	 */
 	@Override
 	public int size() {
 		return size;
 	}
 
+	/**
+	 * indicates whether the tree is empty
+	 * 
+	 * @return boolean to check if tree is empty
+	 */
 	@Override
 	public boolean isEmpty() {
-		if(root != null)
-			return false;
-		return true;
+		return size == 0;
 	}
 	
+	/**
+	 * returns the number of ancestors
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return number of ancestors
+	 */
 	@Override
 	public int depth(Position<E> p) throws InvalidPositionException {
 		if(p == null || isEmpty())
@@ -56,6 +66,12 @@ public class LinkedTree<E> implements Tree<E> {
 		return depth(parent(p)) + 1;
 	}
 
+	/**
+	 * returns the maximum depth of tree
+	 * 
+	 * @throws EmptyTreeException
+	 * @return maximum depth of tree
+	 */
 	@Override
 	public int height() throws EmptyTreeException {
 		if(isEmpty())
@@ -67,136 +83,212 @@ public class LinkedTree<E> implements Tree<E> {
 	/**
 	 * helping method for height()
 	 * 
-	 * @param node BinaryTreeNode<E>
-	 * @return depth of node
+	 * @param p position of node
+	 * @return max depth of tree
 	 */
 	private int heightOf(Position<E> p) {
 		if(isExternal(p))
 			return 0;
 		else {
 			int h = 0;
-			for(Position<E> child : children(p)) {
-				h = Math.max(h,heightOf(child));
+			for(Position<E> childPosition : children(p)) {
+				h = Math.max(h, heightOf(childPosition));
 			}
 			return h + 1;
 		}
 	}
 	
+	/**
+	 * indicates whether position is a root
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return boolean to check if position is a root
+	 */
 	@Override
 	public boolean isRoot(Position<E> p) throws InvalidPositionException {
-		if(p != null && !isEmpty()) {
-			TreeNode<E> node = (TreeNode<E>) p;
-			return node.parent == null;
-		} else {
+		if(p == null || isEmpty())
 			throw new InvalidPositionException();
-		}
+		TreeNode<E> node = (TreeNode<E>) p;
+		return node.parent == null;
 	}
 	
+	/**
+	 * indicates whether position is an internal node
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return boolean to check if position is an internal node
+	 */
 	@Override
 	public boolean isInternal(Position<E> p) throws InvalidPositionException {
-		if(p != null && !isEmpty())
-			//return (hasLeft(p) || hasRight(p));
-			return false;
-		else
+		if(p == null || isEmpty())
 			throw new InvalidPositionException();
+		TreeNode<E> parentNode = (TreeNode<E>)p;
+		return (parentNode.childrenList.isEmpty()) ? false : true;
 	}
 
+	/**
+	 * indicates whether position is an external node
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return boolean to check if position is an external node
+	 */
 	@Override
 	public boolean isExternal(Position<E> p) throws InvalidPositionException {
-		if(p != null && !isEmpty())
-			//return !(hasLeft(p) || hasRight(p));
-			return false;
-		else
+		if(p == null || isEmpty())
 			throw new InvalidPositionException();
+		return (isInternal(p) == false);
 	}
 	
+	/**
+	 * adds a root which stores e to an empty tree
+	 * 
+	 * @param e element to add
+	 * @throws UnemptyTreeException
+	 * @return position of root
+	 */
 	@Override
 	public Position<E> addRoot(E e) throws UnemptyTreeException {
-		if(isEmpty()) {
+		if(!isEmpty())
+			throw new UnemptyTreeException();
+		else {
 			root = new TreeNode<E>(e);
 			size = 1;
 			return root;
-		} else 
-			throw new UnemptyTreeException();
+		}
 	}
 
+	/**
+	 * inserts a new child which stores e
+	 * 
+	 * @param p position of node
+	 * @param e element to add
+	 * @throws InvalidPositionException
+	 * @return position of added child
+	 */
 	@Override
 	public Position<E> insertChild(Position<E> p, E e) throws InvalidPositionException {
-		/**if(p == null || isEmpty() || (hasLeft(p) && hasRight(p)))
+		if(p == null || isEmpty())
 			throw new InvalidPositionException();
-		if(isExternal(p) || !hasLeft(p))
-			return insertLeft(p, e);
-		else if(!hasRight(p))
-			return insertRight(p, e);
-		else
-			throw new InvalidPositionException();**/
-		return null;
+		TreeNode<E> parentNode = (TreeNode<E>)p;
+		TreeNode<E> childNode = new TreeNode<E>(e);
+		childNode.parent = parentNode;
+		parentNode.childrenList.add(childNode);
+		size++;
+		return childNode;
 	}
 	
+	/**
+	 * replace stored element of a node
+	 * 
+	 * @param p position of node
+	 * @param e element to add
+	 * @throws InvalidPositionException
+	 * @return replaced element
+	 */
 	@Override
 	public E replaceElement(Position<E> p, E e) throws InvalidPositionException {
-		if(p != null && !isEmpty()) {
+		if(p == null || isEmpty() || !this.positions().contains(p))
+			throw new InvalidPositionException();
+		else {
 			TreeNode<E> node = (TreeNode<E>) p;
 			return node.element = e;
-		} else
-			throw new InvalidPositionException();
+		}
 	}
 
+	/**
+	 * swaps the elements of two nodes p and q
+	 * 
+	 * @param p position of first node
+	 * @param q position of second node
+	 * @throws InvalidPositionException
+	 */
 	@Override
 	public void swapElements(Position<E> p, Position<E> q) throws InvalidPositionException {
-		if(p == null || isRoot(p))
+		if(p == null || q == null || isEmpty() || !(this.positions().contains(p) && this.positions().contains(q)))
 			throw new InvalidPositionException();
-		
-		TreeNode<E> pNode = (TreeNode<E>) p;
-		TreeNode<E> qNode = (TreeNode<E>) q;
+		TreeNode<E> firstNode = (TreeNode<E>) p;
+		TreeNode<E> secondNode = (TreeNode<E>) q;
 		// save element of p in temp
-		E temp = pNode.element;
+		E temp = firstNode.element;
 		// save element of q in p
-		pNode.element = qNode.element;
+		firstNode.element = secondNode.element;
 		// save temp in q
-		qNode.element = temp;
+		secondNode.element = temp;
 	}
 
+	/**
+	 * returns a list of all elements of the tree
+	 * 
+	 * @return list of elements
+	 */
 	@Override
 	public List<E> elements() {
-		elementList.removeAll(elementList);
+		ArrayList<E> list = new ArrayList<>(this.size());
 		if(isEmpty())
-			return elementList;
-		elementList.add(root.element);
-		elementsList(root);
-		return elementList;
+			return list;
+		list.add(root.element);
+		elementsOf(root, list);
+		return list;
 	}
 	
-	public List<E> elementsList(Position<E> p) {
+	/**
+	 * helping method for elements()
+	 * 
+	 * @param p position of node
+	 * @param list ArrayList to fill with elements
+	 * @return list of elements
+	 */
+	public List<E> elementsOf(Position<E> p, ArrayList<E> list) {
 		for(Position<E> child : children(p)) {
-			elementList.add(child.element());
+			list.add(child.element());
 			// if child has also children
 			if(isInternal(child))
-				elementsList(child);
+				elementsOf(child, list);
 		}
-		return elementList;
+		return list;
 	}
 
+	/**
+	 * returns a list of all positions of the tree
+	 * 
+	 * @return list of positions
+	 */
 	@Override
 	public List<Position<E>> positions() {
-		positionList.removeAll(positionList);
+		ArrayList<Position<E>> list = new ArrayList<>(this.size());
 		if(isEmpty())
-			return positionList;
-		positionList.add(root);
-		positionsList(root);
-		return positionList;
+			return list;
+		list.add(root);
+		positionsOf(root, list);
+		return list;
 	}
 	
-	public List<Position<E>> positionsList(Position<E> p) {
+	/**
+	 * helping method for positions()
+	 * 
+	 * @param p position of node
+	 * @param list ArrayList to fill with positions
+	 * @return list of positions
+	 */
+	public List<Position<E>> positionsOf(Position<E> p, ArrayList<Position<E>> list) {
 		for(Position<E> child : children(p)) {
-			positionList.add(child);
+			list.add(child);
 			// if child has also children
 			if(isInternal(child))
-				positionsList(child);
+				positionsOf(child, list);
 		}
-		return positionList;
+		return list;
 	}
 
+	/**
+	 * returns the root node
+	 * 
+	 * @throws EmptyTreeException
+	 * @return position of root
+	 */
 	@Override
 	public Position<E> root() throws EmptyTreeException {
 		if(isEmpty())
@@ -205,73 +297,143 @@ public class LinkedTree<E> implements Tree<E> {
 			return root;
 	}
 
+	/**
+	 * returns the parent of a node p
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return position of parent
+	 */
 	@Override
 	public Position<E> parent(Position<E> p) throws InvalidPositionException {
 		if(p == null || isEmpty())
 			throw new InvalidPositionException();
 		else {
-			BinaryTreeNode<E> node = (BinaryTreeNode<E>) p;
+			TreeNode<E> node = (TreeNode<E>) p;
 			return node.parent;
 		}
 	}
 
+	/**
+	 * returns a list of all children of a node p
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return list of children
+	 */
 	@Override
 	public List<Position<E>> children(Position<E> p) throws InvalidPositionException {
 		if(p == null || isEmpty())
 			throw new InvalidPositionException();
-		else {
-			BinaryTreeNode<E> node = (BinaryTreeNode<E>) p;
-			childrenList.removeAll(childrenList);
-			// add left child first
-			if(node.leftChild != null)
-				childrenList.add(node.leftChild);
-			if(node.rightChild != null)
-				childrenList.add(node.rightChild);
-			return childrenList;
-		}
+		TreeNode<E> parentNode = (TreeNode<E>)p;
+		return parentNode.childrenList;
 	}
 
+	/**
+	 * returns a list of all descendants of a node p
+	 * 
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return list of descendants
+	 */
 	@Override
 	public List<Position<E>> descendants(Position<E> p) throws InvalidPositionException {
 		if(p == null || isEmpty())
 			throw new InvalidPositionException();
-		// remove all positions from list
-		descendantList.removeAll(descendantList);
-		return descendantsList(p);
+		
+		ArrayList<Position<E>> list = new ArrayList<>(this.size());
+		return descendantsList(p, list);
 	}
 	
-	public List<Position<E>> descendantsList(Position<E> p) {
+	/**
+	 * helping method for descendants(Position<E> p)
+	 * 
+	 * @param p position of node
+	 * @param list ArrayList to fill with descendants
+	 * @return list of all descendants
+	 */
+	public List<Position<E>> descendantsList(Position<E> p, ArrayList<Position<E>> list) {
 		if(isInternal(p)) {
 			// add child to list and check if the child has also children
 			for(Position<E> child : children(p)) {
-				descendantList.add(child);
-				// if child has also children
-				if(isInternal(child))
-					descendantsList(child);
+				list.add(child);
+				// call recursive method, check for internal is above
+				descendantsList(child, list);
 			}
 		}
-		return descendantList;
+		return list;
 	}
 
+	/**
+	 * returns a list of all ancestors of a node p
+	 *
+	 * @param p position of node
+	 * @throws InvalidPositionException
+	 * @return list of ancestors
+	 */
 	@Override
 	public List<Position<E>> ancestors(Position<E> p) throws InvalidPositionException {
 		if(p == null || isEmpty())
 			throw new InvalidPositionException();
-		ancestorList.removeAll(ancestorList);
-		return ancestorsList(p);
+		
+		ArrayList<Position<E>> list = new ArrayList<>(this.size());
+		return ancestorsList(p, list);
 	}
 
-	public List<Position<E>> ancestorsList(Position<E> p) {
+	/**
+	 * helping method for ancestors(Position<E> p)
+	 * 
+	 * @param p position of node
+	 * @param list ArrayList to fill with ancestors
+	 * @return list of ancestors
+	 */
+	public List<Position<E>> ancestorsList(Position<E> p, ArrayList<Position<E>> list) {
 		if(isRoot(p))
-			return ancestorList;
-		ancestorList.add(parent(p));
-		ancestorsList(parent(p));
-		return ancestorList;
+			return list;
+		list.add(parent(p));
+		ancestorsList(parent(p), list);
+		return list;
 	}
 	
+	/**
+	 * returns a String that shows the building of the tree
+	 * 
+	 * @return building of the tree in form of a String
+	 */
 	@Override
 	public String toString() {
-		return null;
+		if(isEmpty())
+			return "";
+		return stringOf(root);
+	}
+	
+	/**
+	 * helping method of toString()
+	 * 
+	 * @param p position of node
+	 * @return building of the tree in form of a String
+	 */
+	public String stringOf(Position<E> p) {
+		String children = "";
+		String parent = p.element().toString();
+		boolean isFirst = true;
+		
+		// check if p has minimally one child
+		if(isInternal(p)) {
+			// loop through children list
+			for(Position<E> child : children(p)) {
+				if(isFirst)
+					isFirst = false;
+				// set space if there is more than one children
+				else
+					children += " ";
+				// check for children of child
+				children += stringOf(child);
+			}
+			return parent + " (" + children + ")";
+		} else {
+			return parent + children;
+		}
 	}
 
 }
