@@ -171,7 +171,6 @@ public class LinkedBinaryTree<E> implements BinaryTree<E> {
 	 */
 	@Override
 	public Position<E> insertChild(Position<E> p, E e) throws InvalidPositionException {
-		// no check if p is null or tree is empty because this will be done in the methods below
 		if(isExternal(p) || !hasLeft(p))
 			return insertLeft(p, e);
 		else if(!hasRight(p))
@@ -588,7 +587,7 @@ public class LinkedBinaryTree<E> implements BinaryTree<E> {
 			}
 			return parent + " (" + children + ")";
 		} else {
-			return parent + children;
+			return parent;
 		}
 	}
 	

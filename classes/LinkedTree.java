@@ -342,7 +342,7 @@ public class LinkedTree<E> implements Tree<E> {
 			throw new InvalidPositionException();
 		
 		ArrayList<Position<E>> list = new ArrayList<>(this.size());
-		return descendantsList(p, list);
+		return descendantsOf(p, list);
 	}
 	
 	/**
@@ -352,13 +352,13 @@ public class LinkedTree<E> implements Tree<E> {
 	 * @param list ArrayList to fill with descendants
 	 * @return list of all descendants
 	 */
-	public List<Position<E>> descendantsList(Position<E> p, ArrayList<Position<E>> list) {
+	public List<Position<E>> descendantsOf(Position<E> p, ArrayList<Position<E>> list) {
 		if(isInternal(p)) {
 			// add child to list and check if the child has also children
 			for(Position<E> child : children(p)) {
 				list.add(child);
 				// call recursive method, check for internal is above
-				descendantsList(child, list);
+				descendantsOf(child, list);
 			}
 		}
 		return list;
@@ -377,7 +377,7 @@ public class LinkedTree<E> implements Tree<E> {
 			throw new InvalidPositionException();
 		
 		ArrayList<Position<E>> list = new ArrayList<>(this.size());
-		return ancestorsList(p, list);
+		return ancestorsOf(p, list);
 	}
 
 	/**
@@ -387,11 +387,11 @@ public class LinkedTree<E> implements Tree<E> {
 	 * @param list ArrayList to fill with ancestors
 	 * @return list of ancestors
 	 */
-	public List<Position<E>> ancestorsList(Position<E> p, ArrayList<Position<E>> list) {
+	public List<Position<E>> ancestorsOf(Position<E> p, ArrayList<Position<E>> list) {
 		if(isRoot(p))
 			return list;
 		list.add(parent(p));
-		ancestorsList(parent(p), list);
+		ancestorsOf(parent(p), list);
 		return list;
 	}
 	
@@ -432,7 +432,7 @@ public class LinkedTree<E> implements Tree<E> {
 			}
 			return parent + " (" + children + ")";
 		} else {
-			return parent + children;
+			return parent;
 		}
 	}
 

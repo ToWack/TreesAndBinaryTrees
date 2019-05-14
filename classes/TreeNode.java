@@ -1,7 +1,6 @@
 package project4.classes;
 
 import java.util.ArrayList;
-
 import project4.interfaces.Position;
 
 /**

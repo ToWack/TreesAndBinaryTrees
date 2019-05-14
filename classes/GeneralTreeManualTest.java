@@ -15,7 +15,18 @@ public class GeneralTreeManualTest {
 	 * @param args unused.
 	 */
 	public static void main(String[] args) {
-		/** test a LinkedBinaryTree */
+		/** test a LinkedTree 
+		 * 
+		 * 							55
+		 * 				4						3
+		 * 	 72    81       89   92
+		 * 		9 10 44
+		 * 
+		 * root 55, with children 4 and 3
+		 * node 4 with children 72, 81, 89 and 92
+		 * node 81 with children 9, 10 and 44
+		 * 
+		 * */
 		LinkedTree<Integer> tree = new LinkedTree<>();
 		System.out.println("Tree created!\n");
 		
